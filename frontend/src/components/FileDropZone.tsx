@@ -1,30 +1,19 @@
 import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
+import Alert from "./Alert";
+import { UPLOAD_IMAGE } from "../constants/constants";
 
-const MAX_FILES = 20;
-const MAX_SIZE_MB = 50;
-const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
-const ACCEPTED_TYPES = [
-  "image/png",
-  "image/jpeg",
-  "image/gif",
-  "image/svg+xml",
-  "image/webp",
-];
-
-export interface SelectedFile {
+export type SelectedFile = {
   id: string;
   file: File;
   preview: string;
-}
+};
 
-interface FileDropZoneProps {
+type FileDropZoneProps = {
   files: SelectedFile[];
   onFilesChange: (files: SelectedFile[]) => void;
   error: string | null;
   onError: (error: string | null) => void;
-}
-
-export { MAX_FILES, MAX_SIZE_MB };
+};
 
 const FileDropZone = ({
   files,
@@ -40,12 +29,12 @@ const FileDropZone = ({
     onError(null);
     const valid: File[] = [];
     for (const f of incoming) {
-      if (!ACCEPTED_TYPES.includes(f.type)) {
+      if (!UPLOAD_IMAGE.ACCEPTED_TYPES.includes(f.type)) {
         onError(`"${f.name}" is not a supported image type.`);
         continue;
       }
-      if (f.size > MAX_SIZE_BYTES) {
-        onError(`"${f.name}" exceeds ${MAX_SIZE_MB}MB.`);
+      if (f.size > UPLOAD_IMAGE.MAX_SIZE_BYTES) {
+        onError(`"${f.name}" exceeds ${UPLOAD_IMAGE.MAX_SIZE_MB}MB.`);
         continue;
       }
       valid.push(f);
@@ -57,14 +46,14 @@ const FileDropZone = ({
     const valid = validate(incoming);
     if (!valid.length) return;
 
-    const remaining = MAX_FILES - files.length;
+    const remaining = UPLOAD_IMAGE.MAX_FILES - files.length;
     if (remaining <= 0) {
-      onError(`Maximum ${MAX_FILES} files allowed.`);
+      onError(`Maximum ${UPLOAD_IMAGE.MAX_FILES} files allowed.`);
       return;
     }
     const toAdd = valid.slice(0, remaining);
     if (valid.length > remaining) {
-      onError(`Only ${remaining} more file(s) can be added.`);
+      onError(`Only ${remaining} file(s) can be added.`);
     }
     onFilesChange([
       ...files,
@@ -150,8 +139,8 @@ const FileDropZone = ({
             drop
           </p>
           <p className="text-xs text-gray-500">
-            PNG, JPG, GIF, SVG or WebP &middot; Max {MAX_SIZE_MB}MB each
-            &middot; Up to {MAX_FILES} files
+            PNG, JPG, GIF, SVG or WebP &middot; Max {UPLOAD_IMAGE.MAX_SIZE_MB}MB
+            each &middot; Up to {UPLOAD_IMAGE.MAX_FILES} files
           </p>
         </div>
         <input
@@ -164,7 +153,7 @@ const FileDropZone = ({
         />
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <Alert alertType="warning" message={error} />}
     </div>
   );
 };

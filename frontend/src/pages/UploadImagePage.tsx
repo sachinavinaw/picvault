@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { TrashIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
-import FileDropZone, {
-  MAX_FILES,
-  type SelectedFile,
-} from "../components/FileDropZone";
+import FileDropZone, { type SelectedFile } from "../components/FileDropZone";
 import ConfirmModal from "../components/ConfirmModal";
+import { UPLOAD_IMAGE } from "../constants/constants";
 
 type ConfirmAction = "upload" | "reset" | null;
 
@@ -96,7 +94,7 @@ const UploadImage = () => {
             </ul>
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500">
-                {files.length} / {MAX_FILES} file
+                {files.length} / {UPLOAD_IMAGE.MAX_FILES} file
                 {files.length !== 1 ? "s" : ""} selected
               </span>
               <div className="flex gap-3">
