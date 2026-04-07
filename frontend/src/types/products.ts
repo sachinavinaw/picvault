@@ -14,3 +14,17 @@ type Products = {
 };
 
 export type { Products };
+
+export type ImageItem = {
+  id: string;
+  url: string;
+  originalFilename: string;
+};
+
+export type UploadingFile = {
+  id: string;
+  file: File;
+  progress: number;
+  status: "pending" | "uploading" | "completed" | "error";
+  url?: string; // Stored URL after upload
+};

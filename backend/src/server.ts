@@ -3,6 +3,7 @@ import { env } from "./config/env";
 import { initDb } from "./config/db";
 import { ensureBucket } from "./services/storage.service";
 import { sequelize } from "./config/db";
+import logger from "./utils/logger";
 import "./models/image.model";
 
 async function start() {
@@ -12,10 +13,10 @@ async function start() {
     await ensureBucket();
 
     app.listen(env.PORT, () => {
-      console.log(`Backend listening on port ${env.PORT}`);
+      logger.info(`Backend listening on port ${env.PORT}`);
     });
   } catch (err) {
-    console.error("Failed to start server", err);
+    logger.error("Failed to start server", err);
     process.exit(1);
   }
 }
