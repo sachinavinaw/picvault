@@ -1,0 +1,40 @@
+openapi: 3.0.3
+info:
+  title: PicVault API
+  version: 1.0.0
+paths:
+  /images:
+    post:
+      summary: Upload multiple images
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        "201":
+          description: Images uploaded
+    get:
+      summary: List all images
+      responses:
+        "200":
+          description: List of images
+  /images/file/{objectKey}:
+    get:
+      summary: Serve image file
+      parameters:
+        - in: path
+          name: objectKey
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Image stream

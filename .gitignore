@@ -35,7 +35,8 @@ bower_components
 .lock-wscript
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
-build/Release
+# Build output
+build/
 
 # Dependency directories
 node_modules/
@@ -137,3 +138,4 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+.DS_store
