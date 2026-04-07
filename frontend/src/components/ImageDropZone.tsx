@@ -1,4 +1,11 @@
-import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
+import {
+  memo,
+  useCallback,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type DragEvent,
+} from "react";
 import Alert from "./Alert";
 import { UPLOAD_IMAGE } from "../constants/constants";
 
@@ -8,93 +15,108 @@ export type SelectedFile = {
   preview: string;
 };
 
-type FileDropZoneProps = {
+type ImageDropZoneProps = {
   files: SelectedFile[];
   onFilesChange: (files: SelectedFile[]) => void;
   error: string | null;
   onError: (error: string | null) => void;
 };
 
-const FileDropZone = ({
+const ImageDropZone = ({
   files,
   onFilesChange,
   error,
   onError,
-}: FileDropZoneProps) => {
+}: ImageDropZoneProps) => {
   const [dragging, setDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const replaceIndexRef = useRef<number | null>(null);
 
-  const validate = (incoming: File[]): File[] => {
-    onError(null);
-    const valid: File[] = [];
-    for (const f of incoming) {
-      if (!UPLOAD_IMAGE.ACCEPTED_TYPES.includes(f.type)) {
-        onError(`"${f.name}" is not a supported image type.`);
-        continue;
+  const validate = useCallback(
+    (incoming: File[]): File[] => {
+      onError(null);
+      const valid: File[] = [];
+      for (const f of incoming) {
+        if (!UPLOAD_IMAGE.ACCEPTED_TYPES.includes(f.type)) {
+          onError(`"${f.name}" is not a supported image type.`);
+          continue;
+        }
+        if (f.size > UPLOAD_IMAGE.MAX_SIZE_BYTES) {
+          onError(`"${f.name}" exceeds ${UPLOAD_IMAGE.MAX_SIZE_MB}MB.`);
+          continue;
+        }
+        valid.push(f);
       }
-      if (f.size > UPLOAD_IMAGE.MAX_SIZE_BYTES) {
-        onError(`"${f.name}" exceeds ${UPLOAD_IMAGE.MAX_SIZE_MB}MB.`);
-        continue;
+      return valid;
+    },
+    [onError],
+  );
+
+  const addFiles = useCallback(
+    (incoming: File[]) => {
+      const valid = validate(incoming);
+      if (!valid.length) return;
+
+      const remaining = UPLOAD_IMAGE.MAX_FILES - files.length;
+      if (remaining <= 0) {
+        onError(`Maximum ${UPLOAD_IMAGE.MAX_FILES} files allowed.`);
+        return;
       }
-      valid.push(f);
-    }
-    return valid;
-  };
+      const toAdd = valid.slice(0, remaining);
+      if (valid.length > remaining) {
+        onError(`Only ${remaining} file(s) can be added.`);
+      }
+      onFilesChange([
+        ...files,
+        ...toAdd.map((file) => ({
+          id: crypto.randomUUID(),
+          file,
+          preview: URL.createObjectURL(file),
+        })),
+      ]);
+    },
+    [files, validate, onError, onFilesChange],
+  );
 
-  const addFiles = (incoming: File[]) => {
-    const valid = validate(incoming);
-    if (!valid.length) return;
-
-    const remaining = UPLOAD_IMAGE.MAX_FILES - files.length;
-    if (remaining <= 0) {
-      onError(`Maximum ${UPLOAD_IMAGE.MAX_FILES} files allowed.`);
-      return;
-    }
-    const toAdd = valid.slice(0, remaining);
-    if (valid.length > remaining) {
-      onError(`Only ${remaining} file(s) can be added.`);
-    }
-    onFilesChange([
-      ...files,
-      ...toAdd.map((file) => ({
+  const replaceFile = useCallback(
+    (index: number, incoming: File[]) => {
+      const valid = validate(incoming);
+      if (!valid.length) return;
+      const updated = [...files];
+      URL.revokeObjectURL(updated[index].preview);
+      const file = valid[0];
+      updated[index] = {
         id: crypto.randomUUID(),
         file,
         preview: URL.createObjectURL(file),
-      })),
-    ]);
-  };
+      };
+      onFilesChange(updated);
+    },
+    [files, validate, onFilesChange],
+  );
 
-  const replaceFile = (index: number, incoming: File[]) => {
-    const valid = validate(incoming);
-    if (!valid.length) return;
-    const updated = [...files];
-    URL.revokeObjectURL(updated[index].preview);
-    const file = valid[0];
-    updated[index] = {
-      id: crypto.randomUUID(),
-      file,
-      preview: URL.createObjectURL(file),
-    };
-    onFilesChange(updated);
-  };
+  const handleFileChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const selected = Array.from(e.target.files || []);
+      if (replaceIndexRef.current !== null) {
+        replaceFile(replaceIndexRef.current, selected);
+        replaceIndexRef.current = null;
+      } else {
+        addFiles(selected);
+      }
+      e.target.value = "";
+    },
+    [replaceFile, addFiles],
+  );
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const selected = Array.from(e.target.files || []);
-    if (replaceIndexRef.current !== null) {
-      replaceFile(replaceIndexRef.current, selected);
-      replaceIndexRef.current = null;
-    } else {
-      addFiles(selected);
-    }
-    e.target.value = "";
-  };
-
-  const handleDrop = (e: DragEvent) => {
-    e.preventDefault();
-    setDragging(false);
-    addFiles(Array.from(e.dataTransfer.files));
-  };
+  const handleDrop = useCallback(
+    (e: DragEvent) => {
+      e.preventDefault();
+      setDragging(false);
+      addFiles(Array.from(e.dataTransfer.files));
+    },
+    [addFiles],
+  );
 
   return (
     <div className="space-y-4">
@@ -140,7 +162,7 @@ const FileDropZone = ({
           </p>
           <p className="text-xs text-gray-500">
             PNG, JPG, GIF, SVG or WebP &middot; Max {UPLOAD_IMAGE.MAX_SIZE_MB}MB
-            each &middot; Up to {UPLOAD_IMAGE.MAX_FILES} files
+            each &middot; Up to {UPLOAD_IMAGE.MAX_FILES} images
           </p>
         </div>
         <input
@@ -158,4 +180,4 @@ const FileDropZone = ({
   );
 };
 
-export default FileDropZone;
+export default memo(ImageDropZone);

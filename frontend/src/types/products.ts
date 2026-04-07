@@ -26,5 +26,5 @@ export type UploadingFile = {
   file: File;
   progress: number;
   status: "pending" | "uploading" | "completed" | "error";
-  url?: string; // Stored URL after upload
+  url?: string;
 };
