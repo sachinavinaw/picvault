@@ -1,7 +1,7 @@
 import { fireEvent, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom";
-import { renderWithQueryClient } from "../../../tests/testUtils";
+import { renderWithQueryClient } from "../../utils/testUtils";
 import UploadImagePage from "./UploadImagePage";
 
 // Mock browser APIs
@@ -21,7 +21,7 @@ vi.mock("react-router", () => ({
 
 // Mock useUploadImages hook
 const mutateAsyncMock = vi.fn();
-vi.mock("../../hooks/useUploadImages", () => ({
+vi.mock("./hooks/useUploadImages", () => ({
   default: () => ({
     mutateAsync: mutateAsyncMock,
     isPending: false,
@@ -57,10 +57,7 @@ vi.mock("../../components/ImageDropZone", () => ({
 
       {error && <p>{error}</p>}
 
-      <button
-        data-testid="trigger-error-btn"
-        onClick={() => onError("Some error")}
-      >
+      <button data-testid="trigger-error-btn" onClick={() => onError("Some error")}>
         Trigger Error
       </button>
     </div>

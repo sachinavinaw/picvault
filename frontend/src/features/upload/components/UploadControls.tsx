@@ -1,4 +1,4 @@
-import type { ConfirmAction } from "../../../hooks/useImageManager";
+import type { ConfirmAction } from "../hooks/useImageManager";
 
 type UploadControlsProps = {
   allFilesUploaded: boolean;
@@ -6,12 +6,7 @@ type UploadControlsProps = {
   isPending: boolean;
   setConfirmAction: React.Dispatch<React.SetStateAction<ConfirmAction>>;
 };
-const UploadControls = ({
-  allFilesUploaded,
-  fileLength,
-  isPending,
-  setConfirmAction,
-}: UploadControlsProps) => {
+const UploadControls = ({ allFilesUploaded, fileLength, isPending, setConfirmAction }: UploadControlsProps) => {
   return (
     <div className="flex items-center justify-between">
       {!allFilesUploaded && (

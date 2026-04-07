@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { type SelectedFile } from "../components/ImageDropZone";
+import { type SelectedFile } from "../../../components/ImageDropZone";
 import useUploadImages from "./useUploadImages";
 
 export type ConfirmAction = "upload" | "reset" | null;
@@ -10,11 +10,8 @@ const useImageManager = () => {
   const [error, setError] = useState<string | null>(null);
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
-  const [uploadedFileIds, setUploadedFileIds] = useState<Set<string>>(
-    new Set(),
-  );
-  const allFilesUploaded =
-    files.length > 0 && uploadedFileIds.size === files.length;
+  const [uploadedFileIds, setUploadedFileIds] = useState<Set<string>>(new Set());
+  const allFilesUploaded = files.length > 0 && uploadedFileIds.size === files.length;
 
   // Keep a ref to files to safely clean up Object URLs on unmount
   // and avoid browser memory leaks

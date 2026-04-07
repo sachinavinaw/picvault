@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import apiClient from "../config/apiClient";
-import { GET_IMAGE_QUERY_KEY } from "../constants/constants";
-import type { ImageItem } from "../types/products";
+import type { ImageItem } from "../../../types/image";
+import apiClient from "../../../config/apiClient";
+import { GET_IMAGE_QUERY_KEY } from "../../../constants/constants";
 
 const fetchImages = async (): Promise<ImageItem[]> => {
   const res = await apiClient.get("/images");
