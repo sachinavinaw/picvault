@@ -30,9 +30,19 @@ Below are the diagrams outlining the architecture and data flow of PicVault.
 
 ![Data Flow Diagram](./diagrams/data-flow-diagram.png)
 
-### 3. Sequence Diagram
+### 3. Sequence Diagrams
 
-![Sequence Diagram](./diagrams/sequence-diagram.png)
+**A. Image Upload**
+
+![Image Upload Sequence Diagram](./diagrams/sequence-diagram-image-upload.png)
+
+**B. Image List**
+
+![Image List Sequence Diagram](./diagrams/sequence-diagram-image-list.png)
+
+**C. Image Serve**
+
+![Image Serve Sequence Diagram](./diagrams/sequence-diagram-image-serve.png)
 
 ## Getting Started with Docker
 
