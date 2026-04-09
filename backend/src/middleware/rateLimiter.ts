@@ -5,4 +5,7 @@ export const apiRateLimiter = rateLimit({
   max: 200,
   standardHeaders: true,
   legacyHeaders: false,
+  message: {
+    error: "Too many requests from this IP, please try again after 15 minutes.",
+  },
 });

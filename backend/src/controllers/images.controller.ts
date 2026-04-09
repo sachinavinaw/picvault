@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { uploadImageToMinio, getPublicUrl } from "../services/storage.service";
 import { ImageModel } from "../models/image.model";
 import { minioClient, BUCKET_NAME } from "../config/minio";
+import { BadRequestException } from "../exceptions/BadRequestException";
 
 export async function uploadImages(
   req: Request,
@@ -11,7 +12,7 @@ export async function uploadImages(
   try {
     const files = (req.files || []) as Express.Multer.File[];
     if (!files.length) {
-      return res.status(400).json({ error: "No files provided" });
+      throw new BadRequestException("No files provided");
     }
 
     const results: any[] = [];

@@ -1,191 +1,90 @@
 # PicVault
 
-PicVault is a full-stack image upload and gallery application built with:
+PicVault is a full-stack image hosting application that allows users to upload, store, and view images securely. It leverages a modern tech stack featuring React, Node.js, and MinIO for S3-compatible object storage.
 
-- **Backend:** Express + TypeScript
-- **Storage:** MinIO object storage
-- **Database:** PostgreSQL
-- **Frontend:** React + Vite + TypeScript
-- **Validation:** Multer upload validation, file type and size checks
+## Project Overview
 
-## Features
+### Backend
 
-- Upload multiple images via `multipart/form-data`
-- Accepts only image MIME types
-- Enforces a max of 20 files per upload
-- Enforces a max file size of 50MB per image
-- Stores image metadata in PostgreSQL
-- Serves uploaded images through a backend proxy route
-- Simple React gallery UI for browsing uploads
+- **Framework:** Node.js with Express and TypeScript.
+- **Database:** PostgreSQL for metadata storage via Sequelize ORM.
+- **Storage:** MinIO (S3-compatible) for high-performance object storage.
+- **Features:** Multipart uploads (up to 20 files), 50MB size limits, rate limiting, and centralized error handling.
+
+### Frontend
+
+- **Framework:** React with TypeScript.
+- **State Management:** TanStack Query (React Query) for efficient data fetching.
+- **Styling:** Tailwind CSS for a responsive and modern UI.
+- **Features:** Drag-and-drop uploads, image gallery with masonry layout, and real-time upload progress.
 
 ## Architecture
 
-- `backend/`
-  - `src/app.ts` — Express app and middleware setup
-  - `src/server.ts` — backend startup, database sync, MinIO bucket ensure
-  - `src/routes/images.routes.ts` — upload, list, and serve image endpoints
-  - `src/middleware/validation.ts` — request validation for upload payloads
-  - `src/services/storage.service.ts` — MinIO upload and public URL helpers
-  - `src/models/image.model.ts` — Sequelize image metadata model
-  - `src/config/` — environment, DB, and MinIO configuration
-- `frontend/`
-  - Vite-powered React app
-  - `src/api/images.ts` — image upload and fetch API helpers
-  - `src/components/` — upload form, gallery display, upload item UI
+Below are the diagrams outlining the architecture and data flow of PicVault.
 
-## Prerequisites
+### 1. High Level Architecture
 
-- Node.js 18+ / 20+
-- npm 10+
-- Docker & Docker Compose (recommended for local infrastructure)
+![High Level Architecture](./diagrams/high-level-architecture.png)
 
-## Local Setup with Docker Compose
+### 2. Data Flow Diagram
 
-From the repository root:
+![Data Flow Diagram](./diagrams/data-flow-diagram.png)
 
-```bash
-docker compose up --build
-```
+### 3. Sequence Diagram
 
-This starts:
+![Sequence Diagram](./diagrams/sequence-diagram.png)
 
-- `minio` on port `9000` (object storage)
-- `minio` console on port `9001`
-- `db` Postgres on port `5432`
-- `backend` API on port `4000`
-- `frontend` app on port `3000`
+## Getting Started with Docker
 
-### Access
+The easiest way to run the entire PicVault stack (Frontend, Backend, Database, and Object Storage) is using Docker Compose.
 
-- Frontend UI: `http://localhost:3000`
-- Backend API: `http://localhost:4000/api`
-- MinIO Console: `http://localhost:9001`
+### Prerequisites
 
-## Backend
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed.
 
-### Install dependencies
+### Running the Application
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/<private-repo>/picvault.git
+   cd picvault
+   ```
+
+2. **Configure Environment Variables:**
+   Create a `.env` file in the root directory (or ensure the `backend/` and `frontend/` directories have their respective `.env` files configured).
+
+3. **Launch with Docker Compose:**
+
+   ```bash
+   docker-compose up --build
+   ```
+
+4. **Access the services:**
+   - **Frontend:** [http://localhost:3000](http://localhost:3000)
+   - **Backend API:** [http://localhost:5000](http://localhost:5000)
+   - **MinIO Console:** [http://localhost:9001](http://localhost:9001)
+
+## Development
+
+If you prefer to run services individually for development:
+
+### Backend
 
 ```bash
 cd backend
 npm install
-```
-
-### Development
-
-```bash
 npm run dev
 ```
 
-### Build
-
-```bash
-npm run build
-```
-
-### Start
-
-```bash
-npm start
-```
-
-### Tests
-
-```bash
-npm test
-```
-
-## Frontend
-
-### Install dependencies
+### Frontend
 
 ```bash
 cd frontend
 npm install
+npm start
 ```
 
-### Development
+## License
 
-```bash
-npm run dev
-```
-
-### Build
-
-```bash
-npm run build
-```
-
-### Tests
-
-```bash
-npm test
-```
-
-## Environment Variables
-
-The Docker Compose setup already provides defaults, but if you run services manually you can use these variables:
-
-### Backend
-
-- `NODE_ENV`
-- `PORT` (default `4000`)
-- `FRONTEND_ORIGIN`
-- `MINIO_ENDPOINT` (default `minio`)
-- `MINIO_PORT` (default `9000`)
-- `MINIO_ACCESS_KEY`
-- `MINIO_SECRET_KEY`
-- `MINIO_BUCKET`
-- `DB_HOST`
-- `DB_PORT`
-- `DB_USER`
-- `DB_PASSWORD`
-- `DB_NAME`
-
-### Frontend
-
-- `VITE_API_BASE_URL` (default `http://localhost:4000/api`)
-
-## API Endpoints
-
-### `POST /api/images`
-
-Upload one or more images with `multipart/form-data` under the `files` field.
-
-Validation rules:
-
-- `multipart/form-data` required
-- Only `image/*` MIME types accepted
-- Maximum 20 files
-- Maximum 50MB per file
-
-### `GET /api/images`
-
-Returns stored image metadata.
-
-### `GET /api/images/file/:objectKey`
-
-Serves the image file streamed from MinIO.
-
-## Notes
-
-- The backend automatically creates the MinIO bucket if it does not exist.
-- Uploaded images are stored in MinIO and metadata is persisted in PostgreSQL.
-- The frontend uses a proxy-style route for image access instead of directly exposing MinIO URLs.
-
-## Useful commands
-
-```bash
-# Start backend only
-cd backend && npm run dev
-
-# Start frontend only
-cd frontend && npm run dev
-
-# Run backend tests
-cd backend && npm test
-
-# Run frontend tests
-cd frontend && npm test
-```
-
----
+This project is licensed under the MIT License.

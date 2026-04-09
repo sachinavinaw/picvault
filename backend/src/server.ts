@@ -8,9 +8,24 @@ import "./models/image.model";
 
 async function start() {
   try {
-    await initDb();
-    await sequelize.sync();
-    await ensureBucket();
+    const initDatabase = async () => {
+      await initDb().catch((err) => {
+        logger.error("Database initialization failed", err);
+        throw err;
+      });
+      await sequelize.sync().catch((err) => {
+        logger.error("Database sync failed", err);
+        throw err;
+      });
+    };
+
+    await Promise.all([
+      initDatabase(),
+      ensureBucket().catch((err) => {
+        logger.error("MinIO bucket initialization failed", err);
+        throw err;
+      }),
+    ]);
 
     app.listen(env.PORT, () => {
       logger.info(`Backend listening on port ${env.PORT}`);
