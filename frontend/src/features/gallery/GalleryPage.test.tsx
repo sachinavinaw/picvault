@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import "@testing-library/jest-dom";
-import { renderWithQueryClient } from "../../../tests/testUtils";
+import { renderWithQueryClient } from "../../utils/testUtils";
 import GalleryPage from "./GalleryPage";
 
 // --- Mock useGetImages hook ---

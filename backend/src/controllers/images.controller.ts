@@ -1,17 +1,14 @@
-import { Request, Response, NextFunction } from "express";
-import { uploadImageToMinio, getPublicUrl } from "../services/storage.service";
-import { ImageModel } from "../models/image.model";
-import { minioClient, BUCKET_NAME } from "../config/minio";
+import { Request, Response, NextFunction } from 'express';
+import { uploadImageToMinio, getPublicUrl } from '../services/storage.service';
+import { ImageModel } from '../models/image.model';
+import { minioClient, BUCKET_NAME } from '../config/minio';
+import { BadRequestException } from '../exceptions/BadRequestException';
 
-export async function uploadImages(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+export async function uploadImages(req: Request, res: Response, next: NextFunction) {
   try {
     const files = (req.files || []) as Express.Multer.File[];
     if (!files.length) {
-      return res.status(400).json({ error: "No files provided" });
+      throw new BadRequestException('No files provided');
     }
 
     const results: any[] = [];
@@ -43,14 +40,10 @@ export async function uploadImages(
   }
 }
 
-export async function listImages(
-  _req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+export async function listImages(_req: Request, res: Response, next: NextFunction) {
   try {
     const images = await ImageModel.findAll({
-      order: [["created_at", "DESC"]],
+      order: [['created_at', 'DESC']],
     });
 
     res.json({
@@ -65,25 +58,18 @@ export async function listImages(
   }
 }
 
-export async function serveImage(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+export async function serveImage(req: Request, res: Response, next: NextFunction) {
   try {
     const { objectKey } = req.params;
 
     const stat = await minioClient.statObject(BUCKET_NAME, objectKey);
-    const contentType =
-      stat.metaData["content-type"] ||
-      stat.metaData["Content-Type"] ||
-      "image/*";
+    const contentType = stat.metaData['content-type'] || stat.metaData['Content-Type'] || 'image/*';
 
-    res.setHeader("Content-Type", contentType);
-    res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
 
     const stream = await minioClient.getObject(BUCKET_NAME, objectKey);
-    stream.on("error", next);
+    stream.on('error', next);
     stream.pipe(res);
   } catch (err) {
     next(err);

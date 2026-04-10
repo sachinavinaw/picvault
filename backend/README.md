@@ -2,6 +2,14 @@
 
 This is the backend API for PicVault, providing core services, database interactions, and secure file storage capabilities.
 
+## Features
+
+- **Image Upload:** Secure multipart file uploads with size, quantity (max 20), and format validation.
+- **Cloud Storage:** S3-compatible object storage integration using MinIO.
+- **Rate Limiting:** IP-based request throttling to prevent abuse and DDoS attempts.
+- **Error Handling:** Centralized exception handling with custom HTTP error types.
+- **Automated Testing:** Extensive E2E API testing using Jest and Supertest.
+
 ## Tech Stack
 
 - **Runtime:** [Node.js](https://nodejs.org/)
@@ -12,6 +20,17 @@ This is the backend API for PicVault, providing core services, database interact
 - **Security:** Helmet, Express Rate Limit, CORS
 - **Logging:** [Pino](https://getpino.io/)
 - **Testing:** [Jest](https://jestjs.io/) & [Supertest](https://github.com/ladjs/supertest)
+
+## Project Structure
+
+- **`src/config/`** - External service and environment setups (e.g., MinIO client).
+- **`src/controllers/`** - Route handlers processing requests and returning responses.
+- **`src/exceptions/`** - Custom HTTP error classes (e.g., `BadRequestException`).
+- **`src/middleware/`** - Express middleware for validation, rate limiting, and error catching.
+- **`src/models/`** - Sequelize database models and schemas.
+- **`src/routes/`** - Express router definitions.
+- **`src/services/`** - Core business logic and external integrations.
+- **`tests/`** - End-to-end (E2E) and unit tests.
 
 ## Getting Started
 
@@ -34,6 +53,17 @@ npm install
 ### Environment Variables
 
 Create a `.env` file in the root of the backend directory. You will need to configure variables for your Postgres database connection, MinIO credentials, and server port. _(Note: Do not commit the `.env` file to version control)._
+
+## API Endpoints
+
+- **`GET /api/images`**: Retrieve a list of all uploaded images, sorted by newest first.
+- **`POST /api/images`**: Upload new images. Accepts `multipart/form-data` with a `files` field.
+  - Allows up to 20 images per request.
+  - Maximum file size is 50MB per image.
+  - Only `image/*` MIME types are allowed.
+- **`GET /api/images/file/:objectKey`**: Retrieve and serve the actual image file directly from the MinIO bucket.
+
+_Note: All API endpoints are protected by a global rate limiter that permits a maximum of 200 requests per 15-minute window per IP address._
 
 ## Available Scripts
 

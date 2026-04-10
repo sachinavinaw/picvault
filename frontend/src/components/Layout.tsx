@@ -1,6 +1,7 @@
 import { CloudArrowUpIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import { ShieldCheckIcon } from "@heroicons/react/24/solid";
-import { NavLink, Outlet } from "react-router";
+import { useEffect } from "react";
+import { NavLink, Outlet, useLocation } from "react-router";
 import { useLoading } from "../stores/loadingStore";
 import Loader from "./Loader";
 
@@ -10,6 +11,15 @@ function navLinkClass({ isActive }: { isActive: boolean }) {
 
 export default function Layout() {
   const isLoading = useLoading();
+  const location = useLocation();
+
+  useEffect(() => {
+    const titles: Record<string, string> = {
+      "/": "Upload | PicVault",
+      "/gallery": "Gallery | PicVault",
+    };
+    document.title = titles[location.pathname] || "PicVault";
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen flex flex-col">

@@ -4,7 +4,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import type { SelectedFile } from "./ImageDropZone";
 import ImageDropZone from "./ImageDropZone";
 import { UPLOAD_IMAGE } from "../constants/constants";
-import { renderWithQueryClient } from "../../tests/testUtils";
+import { renderWithQueryClient } from "../utils/testUtils";
 
 // Mock browser APIs
 vi.stubGlobal("URL", {
@@ -28,17 +28,9 @@ describe("<ImageDropZone />", () => {
   });
 
   const renderDropZone = () =>
-    renderWithQueryClient(
-      <ImageDropZone
-        files={files}
-        onFilesChange={onFilesChange}
-        error={null}
-        onError={onError}
-      />,
-    );
+    renderWithQueryClient(<ImageDropZone files={files} onFilesChange={onFilesChange} error={null} onError={onError} />);
 
-  const createFile = (name: string, type: string, size = 1000) =>
-    new File(["x".repeat(size)], name, { type });
+  const createFile = (name: string, type: string, size = 1000) => new File(["x".repeat(size)], name, { type });
 
   it("renders without crashing", () => {
     renderDropZone();
@@ -67,9 +59,7 @@ describe("<ImageDropZone />", () => {
 
     fireEvent.change(input, { target: { files: [file] } });
 
-    expect(onError).toHaveBeenCalledWith(
-      '"bad.txt" is not a supported image type.',
-    );
+    expect(onError).toHaveBeenCalledWith('"bad.txt" is not a supported image type.');
     expect(onFilesChange).not.toHaveBeenCalled();
   });
 
@@ -77,17 +67,11 @@ describe("<ImageDropZone />", () => {
     renderDropZone();
 
     const input = document.querySelector("input[type='file']")!;
-    const file = createFile(
-      "big.png",
-      "image/png",
-      UPLOAD_IMAGE.MAX_SIZE_BYTES + 1,
-    );
+    const file = createFile("big.png", "image/png", UPLOAD_IMAGE.MAX_SIZE_BYTES + 1);
 
     fireEvent.change(input, { target: { files: [file] } });
 
-    expect(onError).toHaveBeenCalledWith(
-      `"big.png" exceeds ${UPLOAD_IMAGE.MAX_SIZE_MB}MB.`,
-    );
+    expect(onError).toHaveBeenCalledWith(`"big.png" exceeds ${UPLOAD_IMAGE.MAX_SIZE_MB}MB.`);
     expect(onFilesChange).not.toHaveBeenCalled();
   });
 
@@ -105,9 +89,7 @@ describe("<ImageDropZone />", () => {
 
     fireEvent.change(input, { target: { files: [file] } });
 
-    expect(onError).toHaveBeenCalledWith(
-      `Maximum ${UPLOAD_IMAGE.MAX_FILES} files allowed.`,
-    );
+    expect(onError).toHaveBeenCalledWith(`Maximum ${UPLOAD_IMAGE.MAX_FILES} files allowed.`);
     expect(onFilesChange).not.toHaveBeenCalled();
   });
 
@@ -125,14 +107,7 @@ describe("<ImageDropZone />", () => {
   });
 
   it("shows error alert when error prop is provided", () => {
-    render(
-      <ImageDropZone
-        files={[]}
-        onFilesChange={onFilesChange}
-        error="Something went wrong"
-        onError={onError}
-      />,
-    );
+    render(<ImageDropZone files={[]} onFilesChange={onFilesChange} error="Something went wrong" onError={onError} />);
 
     expect(screen.getByText("Something went wrong")).toBeInTheDocument();
   });
