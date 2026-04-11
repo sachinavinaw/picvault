@@ -10,6 +10,11 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   db:
     image: postgres:16-alpine
@@ -37,8 +42,10 @@ services:
       DB_PASSWORD: password
       DB_NAME: picvault
     depends_on:
-      - db
-      - minio
+      db:
+        condition: service_started
+      minio:
+        condition: service_healthy
     ports:
       - "4000:4000"
 
