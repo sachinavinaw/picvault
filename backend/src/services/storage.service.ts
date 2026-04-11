@@ -1,5 +1,6 @@
 import { minioClient, BUCKET_NAME } from "../config/minio";
 import { v4 as uuid } from "uuid";
+import { env } from "../config/env";
 
 export async function ensureBucket() {
   const exists = await minioClient.bucketExists(BUCKET_NAME).catch(() => false);
@@ -28,5 +29,5 @@ export async function uploadImageToMinio(
 
 export function getPublicUrl(objectKey: string): string {
   // Served via backend proxy route
-  return `/api/images/file/${objectKey}`;
+  return `${env.BACKEND_URL}/api/images/file/${objectKey}`;
 }

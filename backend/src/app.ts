@@ -8,7 +8,11 @@ import logger from "./utils/logger";
 
 const app = express();
 
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  }),
+);
 app.use(corsMiddleware);
 app.use(apiRateLimiter);
 app.use(express.json());
