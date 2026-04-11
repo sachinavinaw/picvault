@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { type SelectedFile } from "../../../components/ImageDropZone";
 import useUploadImages from "./useUploadImages";
+import { useQueryClient } from "@tanstack/react-query";
+import { GET_IMAGE_QUERY_KEY } from "../../../constants/constants";
 
 export type ConfirmAction = "upload" | "reset" | null;
 
@@ -12,6 +14,8 @@ const useImageManager = () => {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [uploadedFileIds, setUploadedFileIds] = useState<Set<string>>(new Set());
   const allFilesUploaded = files.length > 0 && uploadedFileIds.size === files.length;
+
+  const queryClient = useQueryClient();
 
   // Keep a ref to files to safely clean up Object URLs on unmount
   // and avoid browser memory leaks
@@ -43,6 +47,7 @@ const useImageManager = () => {
       // Mark all uploaded files as successfully uploaded
       setUploadedFileIds(new Set(files.map((f) => f.id)));
       setUploadProgress(100);
+      queryClient.invalidateQueries({ queryKey: [GET_IMAGE_QUERY_KEY] });
     } catch (err: any) {
       console.error("Upload failed:", err);
       setError(err.response?.data?.error || "Upload failed");

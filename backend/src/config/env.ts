@@ -7,6 +7,7 @@ export const env = {
   NODE_ENV: process.env.NODE_ENV || "development",
   PORT: Number(process.env.PORT || 4000),
   FRONTEND_ORIGIN: process.env.FRONTEND_ORIGIN || "http://localhost:3000",
+  BACKEND_URL: process.env.BACKEND_URL || "http://localhost:4000",
 
   DB_HOST: process.env.DB_HOST || "localhost",
   DB_PORT: Number(process.env.DB_PORT || 5432),

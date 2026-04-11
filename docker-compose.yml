@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 services:
   minio:
     image: minio/minio
@@ -8,8 +8,13 @@ services:
       MINIO_ROOT_PASSWORD: password
     command: server /data --console-address ":9001"
     ports:
-      - '9000:9000'
-      - '9001:9001'
+      - "9000:9000"
+      - "9001:9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   db:
     image: postgres:16-alpine
@@ -18,7 +23,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: picvault
     ports:
-      - '5433:5432'
+      - "5433:5432"
 
   backend:
     build: ./backend
@@ -26,6 +31,7 @@ services:
       NODE_ENV: production
       PORT: 4000
       FRONTEND_ORIGIN: http://localhost:3000
+      BACKEND_URL: http://localhost:4000
       MINIO_ENDPOINT: minio
       MINIO_PORT: 9000
       MINIO_ACCESS_KEY: admin
@@ -37,16 +43,20 @@ services:
       DB_PASSWORD: password
       DB_NAME: picvault
     depends_on:
-      - db
-      - minio
+      db:
+        condition: service_started
+      minio:
+        condition: service_healthy
     ports:
-      - '4000:4000'
+      - "4000:4000"
 
   frontend:
     build: ./frontend
     environment:
-      VITE_API_BASE_URL: https://localhost:4000/api
+      VITE_API_BASE_URL: http://localhost:4000/api
     depends_on:
       - backend
     ports:
-      - '3000:80'
+      - "3000:80"
+    volumes:
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf
